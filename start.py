@@ -19,7 +19,11 @@ class SiteCrawler:
 
     def fetch_links(self, url):
         internal_links = set()
-        headers = {"User-Agent": "Mozilla/5.0"}
+        headers = {
+            "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"}
+
+        # Дополнительные расширения можно добавить по необходимости
+        image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.webp']
         try:
             response = requests.get(url, headers=headers, timeout=10)
             content_type = response.headers.get('Content-Type', '')
@@ -41,7 +45,7 @@ class SiteCrawler:
             for link in tags:
                 href = link['href'] if features == "html.parser" else link.text
 
-                if href.startswith('javascript:') or href == '#':
+                if href.startswith('javascript:') or href == '#' or any(href.endswith(ext) for ext in image_extensions):
                     continue
 
                 processed_href = urlparse(href)._replace(fragment='').geturl()
@@ -67,7 +71,8 @@ class SiteCrawler:
 
     def fetch_sitemap_links(self, sitemap_url):
         sitemap_links = set()
-        headers = {"User-Agent": "Mozilla/5.0"}
+        headers = {
+            "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"}
 
         try:
             response = requests.get(sitemap_url, headers=headers, timeout=10)
